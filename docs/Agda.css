@@ -1,23 +1,45 @@
 @font-face {
-    font-family: DejaVuSans;
+    font-family: DejaVuSansMono;
     font-style: normal;
     font-weight: normal;
-    src:url("fonts/DejaVuSansMono.ttf");
+    src:url("./fonts/DejaVuSansMono/Regular.ttf");
 }
 
 @font-face {
-    font-family: DejaVuSans;
+    font-family: DejaVuSansMono;
     font-style: normal;
     font-weight: bold;
-    src:url("fonts/DejaVuSansMono-Bold.ttf");
+    src:url("./fonts/DejaVuSansMono/Bold.ttf");
 }
 
 @font-face {
-    font-family: DejaVuSans;
+    font-family: DejaVuSansMono;
     font-style: italic;
     font-weight: normal;
-    src:url("fonts/DejaVuSansMono-Oblique.ttf");
+    src:url("./fonts/DejaVuSansMono/Italic.ttf");
 }
+
+@font-face {
+    font-family: SourceCodePro;
+    font-style: normal;
+    font-weight: normal;
+    src:url("./fonts/SourceCodePro/Regular.ttf");
+}
+
+@font-face {
+    font-family: SourceCodePro;
+    font-style: normal;
+    font-weight: bold;
+    src:url("./fonts/SourceCodePro/Bold.ttf");
+}
+
+@font-face {
+    font-family: SourceCodePro;
+    font-style: italic;
+    font-weight: normal;
+    src:url("./fonts/SourceCodePro/Italic.ttf");
+}
+
 
 /* Aspects. */
 .Agda .Comment       { color: #B22222 }
@@ -61,5 +83,4 @@
 .Agda a[href]:hover { background-color: #B4EEB4 }
 .Agda [href].hover-highlight { background-color: #B4EEB4; }
 
-.Agda { font-family: 'DejaVu Sans Mono'; font-size: 10pt; }
-code { font-family: 'DejaVu Sans Mono'; font-size: 10pt; }
+.Agda, code { font-family: 'SourceCodePro'; font-size: 10pt; }

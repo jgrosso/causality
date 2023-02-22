@@ -51,6 +51,8 @@ module CausalGraph (G : DAG) where
   open DAG G
 ```
 
+The pathsh we will be considering are nonempty and acyclic.
+
 ```agda
   record Path : Set where
     field nodes              : List V
@@ -73,14 +75,14 @@ module CausalGraph (G : DAG) where
   open Path
 ```
 
-We define a relation `—↠` s.t. for any two nodes $i, j$ of $G$, `i —↠ j` iff there exists a path starting at $i$ and ending at $j$.
+For any two nodes $i, j$ of $G$, we say `i —↠ j` iff there exists a path starting at $i$ and ending at $j$.
 
 ```agda
   _—↠_ : V → V → Set
   from —↠ to = ∃[ p ] start p ≡ from × end p ≡ to
 ```
 
-
+We define some helper functions for working with paths.
 
 ```agda
   _∃—↠_ = _—↠_
@@ -91,7 +93,9 @@ We define a relation `—↠` s.t. for any two nodes $i, j$ of $G$, `i —↠ j`
   _visits_ : (p : Path) → (v : V) → Set
   p visits v = v ∈ nodes p
     where open import Data.List.Membership.Propositional using (_∈_)
+```
 
+```agda
   ConditioningSet : V → V → Set _
   ConditioningSet i j = Σ (Subset |V|) (_⊆∖ ⁅ i , j ⁆₂)
 
