@@ -84,3 +84,11 @@
 .Agda [href].hover-highlight { background-color: #B4EEB4; }
 
 .Agda, code { font-family: 'SourceCodePro'; font-size: 10pt; }
+
+details summary {
+    font-size: 11pt;
+}
+
+details summary::after {
+    content: '(Collapsed for brevity; click to expand.)';
+}
