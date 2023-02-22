@@ -1,3 +1,10 @@
+---
+title: Causality.Data.List
+---
+
+Proofs about finite lists.
+
+```agda
 module Causality.Data.List where
 
 open import Data.Empty using (⊥-elim)
@@ -35,3 +42,4 @@ head-of-nonempty : ∀ {a} {A : Set a} {l : List A}
   → ∃[ x ] head l ≡ just x
 head-of-nonempty {l = []} l≢[] = ⊥-elim (l≢[] refl)
 head-of-nonempty {l = x ∷ _} l≢[] = x , refl
+```

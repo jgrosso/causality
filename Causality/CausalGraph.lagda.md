@@ -1,7 +1,20 @@
-module Causality.CausalGraph where
+---
+title: Causality.CausalGraph
+---
 
+
+Definitions and proofs about causal graphs.
+
+```agda
+module Causality.CausalGraph where
+```
+
+We import libraries for use below.
+
+```agda
 open import Causality.Data.Fin.Subset
 open import Causality.Data.Graph
+open import Causality.Data.Graphoid
 open import Causality.Data.List
 open import Data.Fin using (Fin)
 open import Data.Fin.Subset using (Subset; ⋃)
@@ -18,18 +31,27 @@ open import Function using (_∘_; case_of_)
 open import Relation.Binary.PropositionalEquality using (_≡_; _≢_; refl)
 open import Relation.Nullary using (¬_)
 open import Relation.Nullary.Negation using (¬?)
+```
 
+We define some utility functions for use below.
+
+```agda
 _-×-_ : ∀ {a b c} {A : Set a} → (A → Set b) → (A → Set c) → (A → Set _)
 P -×- Q = λ x → P x × Q x
 
 _-⊎-_ : ∀ {a b c} {A : Set a} → (A → Set b) → (A → Set c) → (A → Set _)
 P -⊎- Q = λ x → P x ⊎ Q x
+```
 
+We parameterize our development by an arbitrary DAG $G$.
+
+```agda
 module CausalGraph (G : DAG) where
 
   open DAG G
+```
 
-
+```agda
   record Path : Set where
     field nodes              : List V
     field distinct-endpoints : length nodes ≥ 2
@@ -49,11 +71,18 @@ module CausalGraph (G : DAG) where
     end = last-of-nonempty nonempty ₁
 
   open Path
+```
 
+We define a relation —↠ s.t. for any two nodes $i, j$ of $G$, $i —↠ j$ iff there exists a path starting at $i$ and ending at $j$.
 
+```agda
   _—↠_ : V → V → Set
   from —↠ to = ∃[ p ] start p ≡ from × end p ≡ to
+```
 
+
+
+```agda
   _∃—↠_ = _—↠_
 
   triples-along : Path → List (V × V × V)
@@ -138,3 +167,4 @@ module CausalGraph (G : DAG) where
   intervene-on : Subset |V| → DAG
   intervene-on S = filter-edges (λ{ (_ , to) → ¬? (to ∈? S) })
     where open import Data.Fin.Subset.Properties using (_∈?_)
+```

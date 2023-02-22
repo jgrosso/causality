@@ -1,3 +1,10 @@
+---
+title: Causality.Data.Graph
+---
+
+Definitions and proofs about (directed, acyclic, simple, etc.) graphs.
+
+```agda
 module Causality.Data.Graph where
 
 open import Data.Fin using (Fin)
@@ -92,3 +99,4 @@ record DAG : Set where
     where
     acyclic′ : _
     acyclic′ (p , linked) = acyclic (p , filter-edges-removes-paths linked)
+```
