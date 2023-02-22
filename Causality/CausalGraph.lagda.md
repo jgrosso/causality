@@ -73,7 +73,7 @@ module CausalGraph (G : DAG) where
   open Path
 ```
 
-We define a relation —↠ s.t. for any two nodes $i, j$ of $G$, $i —↠ j$ iff there exists a path starting at $i$ and ending at $j$.
+We define a relation `—↠` s.t. for any two nodes $i, j$ of $G$, `i —↠ j` iff there exists a path starting at $i$ and ending at $j$.
 
 ```agda
   _—↠_ : V → V → Set

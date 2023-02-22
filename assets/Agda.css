@@ -1,3 +1,24 @@
+@font-face {
+    font-family: DejaVuSans;
+    font-style: normal;
+    font-weight: normal;
+    src:url("fonts/DejaVuSansMono.ttf");
+}
+
+@font-face {
+    font-family: DejaVuSans;
+    font-style: normal;
+    font-weight: bold;
+    src:url("fonts/DejaVuSansMono-Bold.ttf");
+}
+
+@font-face {
+    font-family: DejaVuSans;
+    font-style: italic;
+    font-weight: normal;
+    src:url("fonts/DejaVuSansMono-Oblique.ttf");
+}
+
 /* Aspects. */
 .Agda .Comment       { color: #B22222 }
 .Agda .Background    {}
@@ -39,3 +60,6 @@
 .Agda a { text-decoration: none }
 .Agda a[href]:hover { background-color: #B4EEB4 }
 .Agda [href].hover-highlight { background-color: #B4EEB4; }
+
+.Agda { font-family: 'DejaVu Sans Mono'; font-size: 10pt; }
+code { font-family: 'DejaVu Sans Mono'; font-size: 10pt; }
