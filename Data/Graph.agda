@@ -50,7 +50,9 @@ record DirectedMultigraph : Set where
     ;  E  = filter P? E
     }
 
+
 module _ {g : DirectedMultigraph} where
+
   open import Data.List.Relation.Unary.Any.Properties using (filter⁻)
   open DirectedMultigraph
   open Linked
@@ -61,6 +63,7 @@ module _ {g : DirectedMultigraph} where
   filter-edges-removes-paths []       = []
   filter-edges-removes-paths [-]      = [-]
   filter-edges-removes-paths (p ∷ p′) = filter⁻ _ p ∷ filter-edges-removes-paths p′
+
 
 record DirectedGraph : Set where
   field base : DirectedMultigraph
@@ -73,6 +76,7 @@ record DirectedGraph : Set where
     { base   = DirectedMultigraph.filter-edges base f
     ; simple = Unique.filter⁺ f simple
     }
+
 
 record DAG : Set where
   field base : DirectedGraph

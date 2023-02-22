@@ -1,9 +1,10 @@
 module Causality.CausalGraph where
 
+open import Causality.Data.Fin.Subset
 open import Causality.Data.Graph
 open import Causality.Data.List
 open import Data.Fin using (Fin)
-open import Data.Fin.Subset using (Subset; ⁅_⁆; _∪_; _∩_; ⋃; Empty) renaming (_─_ to _∖_)
+open import Data.Fin.Subset using (Subset; ⋃)
 import Data.Fin.Subset as Fin
 import Data.Fin.Subset.Properties as Fin
 open import Data.List using (List; _∷_; []; length)
@@ -18,15 +19,6 @@ open import Relation.Binary.PropositionalEquality using (_≡_; _≢_; refl)
 open import Relation.Nullary using (¬_)
 open import Relation.Nullary.Negation using (¬?)
 
-⁅_⁆₂ : ∀ {n} → Fin n × Fin n → Subset n
-⁅ i , j ⁆₂ = ⁅ i ⁆ ∪ ⁅ j ⁆
-
-disjoint : ∀ {n} → Subset n → Subset n → Set
-disjoint S T = Empty (S ∩ T)
-
-_⊆∖_ : ∀ {n} → Subset n → Subset n → Set
-S ⊆∖ T = S Fin.⊆ (Fin.⊤ ∖ T)
-
 _-×-_ : ∀ {a b c} {A : Set a} → (A → Set b) → (A → Set c) → (A → Set _)
 P -×- Q = λ x → P x × Q x
 
@@ -34,7 +26,9 @@ _-⊎-_ : ∀ {a b c} {A : Set a} → (A → Set b) → (A → Set c) → (A →
 P -⊎- Q = λ x → P x ⊎ Q x
 
 module CausalGraph (G : DAG) where
+
   open DAG G
+
 
   record Path : Set where
     field nodes              : List V
@@ -56,6 +50,7 @@ module CausalGraph (G : DAG) where
 
   open Path
 
+
   _—↠_ : V → V → Set
   from —↠ to = ∃[ p ] start p ≡ from × end p ≡ to
 
@@ -74,11 +69,15 @@ module CausalGraph (G : DAG) where
   ∅ : ∀ {i j} → ConditioningSet i j
   ∅ = Fin.⊥ , Fin.⊥⊆
 
+
   module Pattern where
+
     Pattern : ∀ {a} → Set _
     Pattern {a} = V × V × V → Set a
 
+
     module Notation where
+
       _∙_ : ∀ {a b} → (V → V → Set a) → (V → V → Set b) → Pattern
       _l-x_ ∙ _x-r_ = λ{ (l , x , r) → l l-x x × x x-r r }
 
@@ -86,6 +85,7 @@ module CausalGraph (G : DAG) where
       ⟵ = _∃⟵_
 
     open Notation
+
 
     _along_ : ∀ {a} → Pattern {a} → Path → Set _
     pat along p =
@@ -107,6 +107,7 @@ module CausalGraph (G : DAG) where
     noncolliders  = noncollider
 
   open Pattern
+
 
   descendants : V → Set
   descendants i = ∃[ j ] i ∃—↠ j
