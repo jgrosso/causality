@@ -5,6 +5,8 @@ title: Causality.Data.Graphoid
 Definitions and proofs about (semi-)graphoids.
 
 ```agda
+{-# OPTIONS --without-K --safe #-}
+
 module Causality.Data.Graphoid where
 ```
 

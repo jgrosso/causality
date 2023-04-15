@@ -1,0 +1,7 @@
+name: causality
+
+depend:
+  standard-library
+
+include:
+  .

@@ -2,51 +2,43 @@
 title: Causality.Data.Vec.Bounded
 ---
 
-Definitions and proofs about bounded vectors (i.e. finite lists with an upper bound on their lengths)
+Definitions and proofs about bounded vectors (i.e. finite lists with an upper bound on their lengths).
 
 ```agda
+{-# OPTIONS --without-K --safe #-}
+
 module Causality.Data.Vec.Bounded where
 
-open import Causality.Data.Vec.Bounded.Membership.Propositional using (_∈_)
+open import Causality.Data.Vec
+open import Data.List as List using (_∷_)
 open import Data.Nat using (ℕ; suc)
-open import Data.Product using (Σ; _,_)
-open import Data.Vec as Vec using ()
-open import Data.Vec.Relation.Unary.Any using (here; there)
-open import Data.Vec.Bounded using (Vec≤; _,_; _∷_)
-open import Function using (_∘_; case_of_)
-open import Level using (_⊔_)
-open import Relation.Binary.PropositionalEquality as Eq using (_≡_; refl)
+open import Data.Vec as Vec using (Vec; []; _∷_; filter)
+open import Data.Vec.Bounded as Vec≤ using (Vec≤; _,_; toList)
+open import Function using (_∘_)
+open import Level using (Level)
+open import Relation.Binary.PropositionalEquality.Core as Eq using (_≡_; refl)
+open import Relation.Nullary using (no; yes)
+open import Relation.Unary using (Decidable)
 
-length : ∀ {a} {A : Set a} {n} → Vec≤ A n → ℕ
+private
+  variable
+    a : Level
+    A : Set a
+    n : ℕ
+
+length : Vec≤ A n → ℕ
 length = Vec.length ∘ Vec≤.vec
+
+toList∘filter≡filter∘toList : ∀ {p} {P : A → Set p} (P? : Decidable P) (xs : Vec A n)
+  → Vec≤.toList (filter P? xs) ≡ List.filter P? (Vec.toList xs)
+toList∘filter≡filter∘toList P? [] = refl
+toList∘filter≡filter∘toList P? (x ∷ xs)
+  with P? x
+...  | no ¬Px = toList∘filter≡filter∘toList P? xs
+...  | yes Px = Eq.cong (x ∷_) (toList∘filter≡filter∘toList P? xs)
+
+length∘toList≡length : (xs : Vec≤ A n)
+  → List.length (toList xs) ≡ length xs
+length∘toList≡length ([]     , _)                          = refl
+length∘toList≡length (_ ∷ xs , _) rewrite length∘toList xs = refl
 ```
-
-<!--
-We define a bijection between bounded vectors (useful if we want to consider them as sets).
-
--- ```agda
--- module _ {a b} {A : Set a} {B : Set b} where
---   record _⟷_ {n} (xs : Vec≤ A n) (ys : Vec≤ B n) : Set (a ⊔ b) where
---     X : Set _
---     X = Σ A (_∈ xs)
-
---     Y : Set _
---     Y = Σ B (_∈ ys)
-
---     field f   : X → Y
---     field f⁻¹ : Y → X
-
---     field f∘f⁻¹ : (y : Y) → f (f⁻¹ y) ≡ y
---     field f⁻¹∘f : (x : X) → f⁻¹ (f x) ≡ x
-
---   open _⟷_
-
-
---   module _ where
---     open Vec using ([]; _∷_)
-
---     ⟷⇒≡length : ∀ {n} {xs : Vec≤ A n} {ys : Vec≤ B n} → xs ⟷ ys → length xs ≡ length ys
---     ⟷⇒≡length {0}     {[] , _} {[] , _} _      = refl
---     ⟷⇒≡length {suc n} {xs}     {ys}     xs⟷ys = {!!}
-```
--->

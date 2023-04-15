@@ -5,6 +5,8 @@ title: Causality.CausalGraph
 Definitions and proofs about causal graphs.
 
 ```agda
+{-# OPTIONS --without-K --safe #-}
+
 module Causality.CausalGraph where
 ```
 
@@ -79,7 +81,7 @@ we have distinct start– and endpoints.
     nonempty nodes≡[]
       with nodes | distinct-endpoints
     ...  | []    | ()
-    ...  | _ ∷ _ | s≤s _ = case nodes≡[] of λ()
+    ...  | _ ∷ _ | s≤s _ = contradiction nodes≡[] λ()
 
     start : V
     start = head-of-nonempty nonempty ₁

@@ -5,6 +5,8 @@ title: Causality.Data.Graph
 Definitions and proofs about (directed, acyclic, simple, etc.) graphs.
 
 ```agda
+{-# OPTIONS --without-K --safe #-}
+
 module Causality.Data.Graph where
 
 open import Data.Fin using (Fin)
