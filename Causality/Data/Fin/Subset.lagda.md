@@ -537,10 +537,13 @@ module _ {n} where
 
 
 module _ {n} where
-  open Data.Bool.Properties using () renaming (_≟_ to _≟ᵇ_)
   open Data.Fin using (_≟_)
-  open import Data.List.Membership.DecPropositional (_≟_ {n}) using () renaming (_∈_ to _∈ˡ_; _∈?_ to _∈ˡ?_)
   open Causality.Data.List.DecEq (_≟_ {n})
+
+  open Data.Bool.Properties using () renaming (_≟_ to _≟ᵇ_)
+  open import Data.List.Membership.DecPropositional (_≟_ {n}) using () renaming (_∈_ to _∈ˡ_; _∈?_ to _∈ˡ?_)
+  open import Data.List.Membership.Propositional.Properties using (∈-allFin; ∈-filter⁺)
+  open import Data.List.Relation.Unary.Unique.Propositional.Properties using (allFin⁺; filter⁺)
 
   ∣from-List∣≡length :
       Unique xs
@@ -553,22 +556,16 @@ module _ {n} where
   to-List : Subset n → List (Fin n)
   to-List S = filter (_∈? S) (allFin n)
 
+  to-List-Unique : (S : Subset n) → Unique (to-List S)
+  to-List-Unique S = filter⁺ (_∈? S) (allFin⁺ _)
+
   ∈to-List-S⇒∈S : (_∈ˡ to-List S) ⊆ᴾ (_∈ S)
   ∈to-List-S⇒∈S x∈ˡS
     with lookup-result (Any-filter⇒Any-× (_ ≟_) (_∈? _) {l = allFin n} x∈ˡS)
   ...  | x≡ , x∈S rewrite Eq.sym x≡ = x∈S
 
-  length-to-List : (S : Subset n)
-    → length (to-List S) ≡ ∣ S ∣
-  length-to-List S
-    rewrite Eq.sym (count≡length∘filter (_≟ᵇ inside) S)
-          | Eq.sym (length∘toList≡length (Data.Vec.filter (_≟ᵇ inside) S))
-          | toList∘filter≡filter∘toList (_≟ᵇ inside) S
-          | filter-∈filter (_∈? S) (allFin n)
-    = {!!}
-
   ∈S⇒∈to-List-S : (_∈ S) ⊆ᴾ (_∈ˡ to-List S)
-  ∈S⇒∈to-List-S x∈S = {!!}
+  ∈S⇒∈to-List-S = ∈-filter⁺ (_∈? _) (∈-allFin _)
 
   from-to-List : (S : Subset n) → from-List (to-List S) ≡ S
   from-to-List S = extensionality (∈from-to-S⇒∈S , ∈S⇒∈from-to-S)
@@ -579,7 +576,12 @@ module _ {n} where
     ∈S⇒∈from-to-S : S ⊆ from-List (to-List S)
     ∈S⇒∈from-to-S = ∈xs⇒∈from-List-xs ∘ ∈S⇒∈to-List-S
 
-  to-List′ : (S : Subset n)
-    → filter (_∈? S) (allFin n) ≡ filter (_∈ˡ? to-List S) (allFin n)
-  to-List′ S = Eq.sym (filter-∈filter (_∈? S) (allFin n))
+  length-to-List : (S : Subset n)
+    → length (to-List S) ≡ ∣ S ∣
+  length-to-List S =
+    begin
+      length (to-List S)           ≡⟨ ∣from-List∣≡length (to-List-Unique _) ⟩⟨ Eq.sym ⟩
+      ∣ from-List (to-List S) ∣    ≡⟨ from-to-List S ⟩⟨ Eq.cong ∣_∣ ⟩
+      ∣ S ∣
+    ∎
 ```

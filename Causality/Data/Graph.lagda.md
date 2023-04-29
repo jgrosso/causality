@@ -61,17 +61,16 @@ record DirectedMultigraph : Set where
 
 
 module _ {g : DirectedMultigraph} where
-
   open import Data.List.Relation.Unary.Any.Properties using (filter⁻)
   open DirectedMultigraph
   open Linked
   open import Relation.Unary using (_⊆_)
 
-  filter-edges-removes-paths : ∀ {p} {P : Edge g → Set p} {P? : Decidable P}
+  filter-edges-removes-paths : ∀ {p} {P : Edge g → Set p} (P? : Decidable P)
     → DirectedPath (filter-edges g P?) ⊆ DirectedPath g
-  filter-edges-removes-paths []       = []
-  filter-edges-removes-paths [-]      = [-]
-  filter-edges-removes-paths (p ∷ p′) = filter⁻ _ p ∷ filter-edges-removes-paths p′
+  filter-edges-removes-paths P? []       = []
+  filter-edges-removes-paths P? [-]      = [-]
+  filter-edges-removes-paths P? (p ∷ p′) = filter⁻ P? p ∷ filter-edges-removes-paths P? p′
 
 
 record DirectedGraph : Set where
@@ -100,5 +99,5 @@ record DAG : Set where
     }
     where
     acyclic′ : _
-    acyclic′ (p , linked) = acyclic (p , filter-edges-removes-paths linked)
+    acyclic′ (p , linked) = acyclic (p , filter-edges-removes-paths f linked)
 ```

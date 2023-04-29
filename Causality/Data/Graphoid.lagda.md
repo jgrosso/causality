@@ -13,12 +13,15 @@ module Causality.Data.Graphoid where
 We import libraries for use below.
 
 ```agda
+open import Algebra.Bundles using (Monoid)
 open import Causality.Data.Fin.Subset
+open import Causality.Function
 open import Data.Fin using (Fin; #_)
 open import Data.Fin.Properties using (_≟_)
 open import Data.Fin.Subset using (Subset; _∪_; _⊆_; ⁅_⁆; ∣_∣) renaming (⊥ to ∅)
 open import Data.Fin.Subset.Properties using (x∈p∩q⁻; x∈⁅y⁆⇒x≡y)
-open import Data.List using (List; []; _∷_; [_]; _++_)
+open import Data.List using (List; []; _∷_; [_]; _++_; concatMap)
+open import Data.List.Properties using (++-monoid)
 open import Data.List.Relation.Unary.Any using (here; there)
 open import Data.List.Relation.Unary.Unique.Propositional using (Unique)
 open import Data.Maybe using (just; nothing)
@@ -66,7 +69,11 @@ We represent the universe by a finite set $U$ (namely, with cardinality $|U|$).
     field base : Triple
     open Triple base public
 
-    field disjoint : Disjoint _₁ _₂ × Disjoint _₂ _₃ × Disjoint _₁ _₃
+    field
+      disjoint :
+        Disjoint _₁ _₂ ×
+        Disjoint _₂ _₃ ×
+        Disjoint _₁ _₃
 
   open DisjointTriple
 ```
@@ -100,7 +107,7 @@ We now define the (semi-)graphoid axioms, and define (semi-)graphoids to be depe
     Decomposition : Set
     Decomposition = ∀ {x y z w}
       → ⟨ x , z , y ∪ w ⟩ ∈ M
-      → ⟨ x , z , y ⟩ ∈ M
+      → ⟨ x , z , y     ⟩ ∈ M
 
     WeakUnion : Set
     WeakUnion = ∀ {x y z w}
@@ -109,7 +116,7 @@ We now define the (semi-)graphoid axioms, and define (semi-)graphoids to be depe
 
     Contraction : Set
     Contraction = ∀ {x y z w}
-      → ⟨ x , z , y ⟩ ∈ M
+      → ⟨ x , z , y     ⟩ ∈ M
       → ⟨ x , z ∪ y , w ⟩ ∈ M
       → ⟨ x , z , y ∪ w ⟩ ∈ M
 
@@ -158,6 +165,37 @@ We now define the (semi-)graphoid axioms, and define (semi-)graphoids to be depe
     open IsGraphoid is-graphoid public
 
   open Graphoid
+
+
+  generate-semi-graphoid : List DisjointTriple → SemiGraphoid
+  generate-semi-graphoid generators =
+    record
+      { M                = M′
+      ; is-semi-graphoid = {!!}
+      }
+    where
+    M′ : DependencyModel
+    M′ =
+      concatMap
+        (symmetric-closure ⟨++⟩ decomposition-closure ⟨++⟩ weak-union-closure ⟨++⟩ contraction-closure)
+        generators
+      where
+      open Monoid (←-monoid (++-monoid _)) renaming (_∙_ to _⟨++⟩_)
+
+      symmetric-closure : DisjointTriple → List DisjointTriple
+      symmetric-closure (⟨ x , z , y ⟩ , x-disjoint-z , z-disjoint-y , x-disjoint-y) =
+        [ ⟨ y , z , x ⟩ , disjoint′ ]
+        where
+        disjoint′ = Disjoint-sym z-disjoint-y , Disjoint-sym x-disjoint-z , Disjoint-sym x-disjoint-y
+
+      decomposition-closure : DisjointTriple → List DisjointTriple
+      decomposition-closure x = {!!}
+
+      weak-union-closure : DisjointTriple → List DisjointTriple
+      weak-union-closure x = {!!}
+
+      contraction-closure : DisjointTriple → List DisjointTriple
+      contraction-closure x = {!!}
 
 
 module _ where
