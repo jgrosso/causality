@@ -13,54 +13,58 @@ module Causality.Data.Graphoid where
 We import libraries for use below.
 
 ```agda
-open import Algebra.Bundles using (Monoid)
-open import Causality.Data.Fin.Subset
-open import Causality.Function
-open import Data.Fin using (Fin; #_)
-open import Data.Fin.Properties using (_≟_)
-open import Data.Fin.Subset using (Subset; _∪_; _⊆_; ⁅_⁆; ∣_∣) renaming (⊥ to ∅)
-open import Data.Fin.Subset.Properties using (x∈p∩q⁻; x∈⁅y⁆⇒x≡y)
-open import Data.List using (List; []; _∷_; [_]; _++_; concatMap)
-open import Data.List.Properties using (++-monoid)
-open import Data.List.Relation.Unary.Any using (here; there)
-open import Data.List.Relation.Unary.Unique.Propositional using (Unique)
-open import Data.Maybe using (just; nothing)
-open import Data.Nat using (ℕ; _≤_; s≤s; z≤n)
-open import Data.Product using (∃-syntax; Σ-syntax; Σ; _×_; _,_; proj₁; proj₂)
-open import Data.Sum using (_⊎_; inj₁; inj₂)
-open import Data.Vec using (Vec)
-import Data.Vec as Vec
-open import Function using (case_of_)
-import Induction.WellFounded as Wf
-open import Relation.Binary.PropositionalEquality using (refl; _≡_)
-open import Relation.Nullary using (¬_)
-open import Relation.Nullary.Decidable.Core using (False; toWitnessFalse)
+open import Causality.Data.Fin.Subset renaming (_≟_ to _≟ˢ_)
+open import Data.Fin using (Fin)
+open import Data.Fin.Subset using (Subset; _∪_)
+open import Data.List using (List)
+open import Data.List.Membership.Propositional using () renaming (_∈_ to _∈ˡ_)
+open import Data.Nat using (ℕ)
+open import Data.Product using (∃-syntax; Σ-syntax; _×_; _,_)
+open import Level using (Level; _⊔_; suc)
+open import Relation.Binary.Definitions using (DecidableEquality)
+open import Relation.Binary.PropositionalEquality using (refl)
+open import Relation.Nullary using (¬_; _×-dec_; contradiction; no; yes)
+open import Relation.Unary using (Pred) renaming (_∈_ to _∈ᵖ_)
+```
+
+```agda
+private
+  variable
+    a b : Level
 ```
 
 We begin by formalizing the following definition on pg. 11 of [@geiger]:
 
 > A *dependency model* $M$ over a finite set of elements $U$ is any subset of triplets $(X, Z, Y)$ where $X$, $Y$, and $Z$ are disjoint subsets of $U$.
 
-We parameterize our definitions by the cardinality $|U|$ of our universe of discourse.
+We will parameterize our definitions by the cardinality $|U|$ of our universe of discourse. We will represent the universe itself by a finite set $U$ (i.e. with cardinality $|U|$).
 
 ```agda
-module Graphoid (|U| : ℕ) where
+module Graphoid (∣U∣ : ℕ) where
+  U : Set _
+  U = Fin ∣U∣
 ```
 
-We represent the universe by a finite set $U$ (namely, with cardinality $|U|$).
-
-```agda
-  U : Set
-  U = Fin |U|
-```
+We define (disjoint) triples:
 
 ```agda
   record Triple : Set where
     constructor ⟨_,_,_⟩
     field
-      _₁ : Subset |U|
-      _₂ : Subset |U|
-      _₃ : Subset |U|
+      _₁ : Subset ∣U∣
+      _₂ : Subset ∣U∣
+      _₃ : Subset ∣U∣
+
+    open import Data.Vec.Properties using (≡-dec)
+    open import Relation.Nullary.Decidable.Core using (_×-dec_)
+
+  _≟³_ : DecidableEquality Triple
+  ⟨ x₁ , x₂ , x₃ ⟩ ≟³ ⟨ y₁ , y₂ , y₃ ⟩
+    with x₁ ≟ˢ y₁ | x₂ ≟ˢ y₂ | x₃ ≟ˢ y₃
+  ...  | no x₁≢y₁ | _        | _        = no λ{ refl → x₁≢y₁ refl }
+  ...  | yes _    | no x₂≢y₂ | _        = no λ{ refl → x₂≢y₂ refl }
+  ...  | yes _    | yes _    | no x₃≢y₃ = no λ{ refl → x₃≢y₃ refl }
+  ...  | yes refl | yes refl | yes refl = yes refl
 
 
   record DisjointTriple : Set where
@@ -75,215 +79,133 @@ We represent the universe by a finite set $U$ (namely, with cardinality $|U|$).
         Disjoint _₂ _₃ ×
         Disjoint _₁ _₃
 
-  open DisjointTriple
+  _≟ᵈ³_ : DecidableEquality DisjointTriple
+  (x , x-disjoint₁₂ , x-disjoint₂₃ , x-disjoint₁₃) ≟ᵈ³ (y , y-disjoint₁₂ , y-disjoint₂₃ , y-disjoint₁₃)
+    with x ≟³ y
+  ...  | no  x≢y  = no λ{ refl → x≢y refl }
+  ...  | yes refl = yes refl
 ```
 
-[@geiger] defines dependency models in terms of sets, which are difficult to represent directly in Agda.
-Instead, we define a dependency model as a finite list of mutually disjoint triplets.
-
 ```agda
-  DependencyModel : Set
-  DependencyModel = List DisjointTriple
-```
+  record DependencyModel : Set (suc (a ⊔ b)) where
+    field
+      Carrier : Set a
+      _∈_     : DisjointTriple → Carrier → Set b
 
-We define notation to allow us to represent statements of the form $(X, Y, Z) \in M$ (i.e. $I(X, Y, Z)$) as `⟨ X , Y , Z ⟩ ∈ M`.
+    _⋲_ : Triple → Carrier → Set b
+    x ⋲ M = ∃[ disjoint ] (x , disjoint) ∈ M
 
-```agda
-  _∈_ : Triple → DependencyModel → Set
-  ⟨ x , y , z ⟩ ∈ M = ∃[ disjoint ] (⟨ x , y , z ⟩ , disjoint) ∈ˡ M
-    where open import Data.List.Membership.Propositional using () renaming (_∈_ to _∈ˡ_)
 ```
 
 We now define the (semi-)graphoid axioms, and define (semi-)graphoids to be dependency models that satisfy these axioms.
+The following will be parameterized by the implementation of a dependency model.
 
 ```agda
-  module _ (M : DependencyModel) where
+  module _ (ℳ : DependencyModel {a} {b}) where
+    open DependencyModel ℳ
 
-    Symmetry : Set
-    Symmetry = ∀ {x y z}
-      → ⟨ x , z , y ⟩ ∈ M
-      → ⟨ y , z , x ⟩ ∈ M
+    module _ (M : Carrier) where
+      Symmetry : Set _
+      Symmetry = ∀ {x y z}
+        → ⟨ x , z , y ⟩ ⋲ M
+        → ⟨ y , z , x ⟩ ⋲ M
 
-    Decomposition : Set
-    Decomposition = ∀ {x y z w}
-      → ⟨ x , z , y ∪ w ⟩ ∈ M
-      → ⟨ x , z , y     ⟩ ∈ M
+      Decomposition : Set _
+      Decomposition = ∀ {x y z w}
+        → ⟨ x , z , y ∪ w ⟩ ⋲ M
+        → ⟨ x , z , y     ⟩ ⋲ M
 
-    WeakUnion : Set
-    WeakUnion = ∀ {x y z w}
-      → ⟨ x , z , y ∪ w ⟩ ∈ M
-      → ⟨ x , z ∪ w , y ⟩ ∈ M
+      WeakUnion : Set _
+      WeakUnion = ∀ {x y z w}
+        → ⟨ x , z , y ∪ w ⟩ ⋲ M
+        → ⟨ x , z ∪ w , y ⟩ ⋲ M
 
-    Contraction : Set
-    Contraction = ∀ {x y z w}
-      → ⟨ x , z , y     ⟩ ∈ M
-      → ⟨ x , z ∪ y , w ⟩ ∈ M
-      → ⟨ x , z , y ∪ w ⟩ ∈ M
+      Contraction : Set _
+      Contraction = ∀ {x y z w}
+        → ⟨ x , z , y     ⟩ ⋲ M
+        → ⟨ x , z ∪ y , w ⟩ ⋲ M
+        → ⟨ x , z , y ∪ w ⟩ ⋲ M
 
-    Intersection : Set
-    Intersection = ∀ {x y z w}
-      → ⟨ x , z ∪ w , y ⟩ ∈ M
-      → ⟨ x , z ∪ y , w ⟩ ∈ M
-      → ⟨ x , z , y ∪ w ⟩ ∈ M
+      Intersection : Set _
+      Intersection = ∀ {x y z w}
+        → ⟨ x , z ∪ w , y ⟩ ⋲ M
+        → ⟨ x , z ∪ y , w ⟩ ⋲ M
+        → ⟨ x , z , y ∪ w ⟩ ⋲ M
 
 
-  record IsSemiGraphoid (M : DependencyModel) : Set where
+    record IsSemiGraphoid (M : Carrier) : Set b where
+      field
+        symmetry      : Symmetry      M
+        decomposition : Decomposition M
+        weak-union    : WeakUnion     M
+        contraction   : Contraction   M
+
+
+    record IsGraphoid (M : Carrier) : Set b where
+      field
+        semi-graphoid : IsSemiGraphoid M
+        intersection  : Intersection   M
+
+      open IsSemiGraphoid semi-graphoid public
+
+
+  record SemiGraphoid : Set (suc (a ⊔ b)) where
+    field ℳ : DependencyModel {a} {b}
+    open DependencyModel ℳ using (Carrier)
+    open DependencyModel ℳ using (_∈_) public
+
     field
-      symmetry      : Symmetry      M
-      decomposition : Decomposition M
-      weak-union    : WeakUnion     M
-      contraction   : Contraction   M
-
-  open IsSemiGraphoid
-
-
-  record SemiGraphoid : Set where
-    field
-      M                : DependencyModel
-      is-semi-graphoid : IsSemiGraphoid M
+      M                : Carrier
+      is-semi-graphoid : IsSemiGraphoid ℳ M
 
     open IsSemiGraphoid is-semi-graphoid public
 
-  open SemiGraphoid
 
+  record Graphoid : Set (suc (a ⊔ b)) where
+    field ℳ : DependencyModel {a} {b}
+    open DependencyModel ℳ using (Carrier)
+    open DependencyModel ℳ using (_∈_) public
 
-  record IsGraphoid (M : DependencyModel) : Set where
     field
-      semi-graphoid : IsSemiGraphoid M
-      intersection  : Intersection   M
-
-    open IsSemiGraphoid semi-graphoid public
-
-  open IsGraphoid
-
-
-  record Graphoid : Set where
-    field
-      M           : DependencyModel
-      is-graphoid : IsGraphoid M
+      M           : Carrier
+      is-graphoid : IsGraphoid ℳ M
 
     open IsGraphoid is-graphoid public
 
-  open Graphoid
 
-
-  generate-semi-graphoid : List DisjointTriple → SemiGraphoid
-  generate-semi-graphoid generators =
+  predicate-dependency-model : ∀ {b} → DependencyModel {b = b}
+  predicate-dependency-model {b = b} =
     record
-      { M                = M′
-      ; is-semi-graphoid = {!!}
+      { Carrier = Pred DisjointTriple b
+      ; _∈_     = _∈ᵖ_
       }
-    where
-    M′ : DependencyModel
-    M′ =
-      concatMap
-        (symmetric-closure ⟨++⟩ decomposition-closure ⟨++⟩ weak-union-closure ⟨++⟩ contraction-closure)
-        generators
-      where
-      open Monoid (←-monoid (++-monoid _)) renaming (_∙_ to _⟨++⟩_)
+```
 
-      symmetric-closure : DisjointTriple → List DisjointTriple
-      symmetric-closure (⟨ x , z , y ⟩ , x-disjoint-z , z-disjoint-y , x-disjoint-y) =
-        [ ⟨ y , z , x ⟩ , disjoint′ ]
-        where
-        disjoint′ = Disjoint-sym z-disjoint-y , Disjoint-sym x-disjoint-z , Disjoint-sym x-disjoint-y
+```agda
+  module Free where
+```
 
-      decomposition-closure : DisjointTriple → List DisjointTriple
-      decomposition-closure x = {!!}
+The list of generators:
 
-      weak-union-closure : DisjointTriple → List DisjointTriple
-      weak-union-closure x = {!!}
+```agda
+    _∈_ : DisjointTriple → List DisjointTriple → Set
+    x ∈ G = {!!}
 
-      contraction-closure : DisjointTriple → List DisjointTriple
-      contraction-closure x = {!!}
-
-
-module _ where
-  private
-    |U| : ℕ
-    |U| = 4
-
-  open module G = Graphoid |U| hiding (⟨_,_,_⟩)
-
-  private
-    x y z w : Subset |U|
-    x = ⁅ # 0 ⁆
-    y = ⁅ # 1 ⁆
-    z = ⁅ # 2 ⁆
-    w = ⁅ # 3 ⁆
-
-    disjoint : ∀ m n {m≢n : False (m ≟ n)} → Disjoint {n = |U|} ⁅ m ⁆ ⁅ n ⁆
-    disjoint m n {m≢n} (_ , x∈⁅m⁆∩⁅n⁆)
-      with x∈p∩q⁻ _ _ x∈⁅m⁆∩⁅n⁆
-    ...  | x∈⁅m⁆ , x∈⁅n⁆
-           with x∈⁅y⁆⇒x≡y _ x∈⁅m⁆ | x∈⁅y⁆⇒x≡y _ x∈⁅n⁆
-    ...       | refl              | refl = toWitnessFalse m≢n refl
-
-    M₁ : G.DisjointTriple
-    M₁ = G.⟨ x , z , y ⟩ , disjoint (# 0) (# 2) , disjoint (# 2) (# 1) , disjoint (# 0) (# 1)
-
-    M₂ : G.DisjointTriple
-    M₂ = G.⟨ y , z , x ⟩ , disjoint (# 1) (# 2) , disjoint (# 2) (# 0) , disjoint (# 1) (# 0)
-
-    M₃ : G.DisjointTriple
-    M₃ = G.⟨ x , z , ∅ ⟩ , disjoint (# 0) (# 2) , Disjoint-∅ʳ z , Disjoint-∅ʳ x
-
-    M₄ : G.DisjointTriple
-    M₄ = G.⟨ ∅ , z , x ⟩ , disjoint (# 0) (# 2) , Disjoint-∅ʳ z , Disjoint-∅ʳ x
-
-    M : List G.DisjointTriple
-    M = [ M₁ ] ++ [ M₂ ] ++ [ M₃ ] ++ [ M₄ ]
-
-    ⟨x,y,z⟩∈M⇒∣x∣≤1 : ∀ {x y z} → G.⟨ x , y , z ⟩ ∈ M → ∣ x ∣ ≡ 0 ⊎ ∣ x ∣ ≡ 1
-    ⟨x,y,z⟩∈M⇒∣x∣≤1 (_ , here refl)                         = inj₂ refl
-    ⟨x,y,z⟩∈M⇒∣x∣≤1 (_ , there (here refl))                 = inj₂ refl
-    ⟨x,y,z⟩∈M⇒∣x∣≤1 (_ , there (there (here refl)))         = inj₂ refl
-    ⟨x,y,z⟩∈M⇒∣x∣≤1 (_ , there (there (there (here refl)))) = inj₁ refl
-
-    ⟨x,y,z⟩∈M⇒∣y∣≡1 : ∀ {x y z} → G.⟨ x , y , z ⟩ ∈ M → ∣ y ∣ ≡ 1
-    ⟨x,y,z⟩∈M⇒∣y∣≡1 (_ , here refl)                         = refl
-    ⟨x,y,z⟩∈M⇒∣y∣≡1 (_ , there (here refl))                 = refl
-    ⟨x,y,z⟩∈M⇒∣y∣≡1 (_ , there (there (here refl)))         = refl
-    ⟨x,y,z⟩∈M⇒∣y∣≡1 (_ , there (there (there (here refl)))) = refl
-
-    ⟨x,y,z⟩∈M⇒∣z∣≤1 : ∀ {x y z} → G.⟨ x , y , z ⟩ ∈ M → ∣ z ∣ ≡ 0 ⊎ ∣ z ∣ ≡ 1
-    ⟨x,y,z⟩∈M⇒∣z∣≤1 (_ , here refl)                         = inj₂ refl
-    ⟨x,y,z⟩∈M⇒∣z∣≤1 (_ , there (here refl))                 = inj₂ refl
-    ⟨x,y,z⟩∈M⇒∣z∣≤1 (_ , there (there (here refl)))         = inj₁ refl
-    ⟨x,y,z⟩∈M⇒∣z∣≤1 (_ , there (there (there (here refl)))) = inj₂ refl
-
-  symmetry-M : Symmetry M
-  symmetry-M (_ , here refl)                         = DisjointTriple.disjoint M₂ , there (here refl)
-  symmetry-M (_ , there (here refl))                 = DisjointTriple.disjoint M₁ , here refl
-  symmetry-M (_ , there (there (here refl)))         = DisjointTriple.disjoint M₄ , there (there (there (here refl)))
-  symmetry-M (_ , there (there (there (here refl)))) = DisjointTriple.disjoint M₃ , there (there (here refl))
-
-  decomposition-M : Decomposition M
-  decomposition-M {x = x} {y = y} {z = z} {w = w} ∈M
-    with ⟨x,y,z⟩∈M⇒∣x∣≤1 ∈M | ⟨x,y,z⟩∈M⇒∣y∣≡1 ∈M | ⟨x,y,z⟩∈M⇒∣z∣≤1 ∈M
-  ...  | _                 | g           | (inj₁ ∣y∪w∣≡0) = {!∣x∣≡0⇒x≡∅ ∣y∪w∣≡0!}
-  ...  | _                 | g           | (inj₂ ∣y∪w∣≡1) = {!∣x∣≡0⇒x≡∅ ∣y∪w∣≡1!}
-
-  -- ⟨_,_,_⟩ : (x : Subset |U|) (y : Subset |U|) (z : Subset |U|) {∣x∣≡1 : True (∣ x ∣ ≟ 1)} {∣y∣≡1 : True (∣ y ∣ ≟ 1)} {∣z∣≡1 : True (∣ z ∣ ≟ 1)} → DisjointTriple
-  -- ⟨ x , y , z ⟩ {∣x∣≡1} {∣y∣≡1} {∣z∣≡1}
-  --   with toWitness ∣x∣≡1 | toWitness ∣y∣≡1 | toWitness ∣z∣≡1 | x | y | z
-  -- ...  | ∣x∣≡1           | ∣y∣≡1           | ∣z∣≡1           | x | y | z =
-  --   G.⟨ x , y , z ⟩ , (λ x₂ → {!!}) , {!!} , {!!}
-
-  semi-graphoid-⊂-graphoid :
-    Σ[ semi-graphoid ∈ SemiGraphoid ]
-      ¬ IsGraphoid (SemiGraphoid.M semi-graphoid)
-  semi-graphoid-⊂-graphoid =
-    record
-      { M                = M
-      ; is-semi-graphoid =
-        record
-          { symmetry      = symmetry-M
-          ; decomposition = decomposition-M
-          ; weak-union    = {!!}
-          ; contraction   = {!!}
-          }
-      } ,
-    λ is-graphoid → {!!}
-    where open import Data.Fin.Subset.Properties using (x∈p∪q⁻)
-  ```
+    semi-graphoid : List DisjointTriple → SemiGraphoid
+    semi-graphoid G =
+      record
+        { ℳ =
+          record
+            { Carrier = List DisjointTriple
+            ; _∈_ = _∈_
+            }
+        ; M = G
+        ; is-semi-graphoid =
+          record
+            { symmetry      = {!!}
+            ; decomposition = {!!}
+            ; weak-union    = {!!}
+            ; contraction   = {!!}
+            }
+        }
+```

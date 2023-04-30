@@ -17,8 +17,9 @@ open import Causality.Data.Vec.Bounded as Vec≤ hiding (length)
 open import Causality.Function
 open import Causality.Relation.Binary.PropositionalEquality
 open import Causality.Relation.Binary.PropositionalEquality.≡-Reasoning
-import Data.Bool.Properties
+open import Data.Bool.Properties using () renaming (_≟_ to _≟ᵇ_)
 open import Data.Fin using (Fin; #_; inject₁; inject≤; suc; zero)
+open import Data.Fin.Properties using () renaming (_≟_ to _≟ᶠ_)
 open import Data.Fin.Subset using (Subset; _∩_; _∪_; _⊂_; _⊆_; _∈_; _∉_; ⊤; ⁅_⁆; ∣_∣; _-_; Empty; inside; Nonempty; outside) renaming (_─_ to _∖_; ⊥ to ∅)
 open import Data.Fin.Subset.Properties using (_∈?_; ⊆-antisym; ∪-assoc; ∪-comm; ∩-comm; ∩-idem; ∩-zeroˡ; ∩-zeroʳ; ∉⊥; ∣⊥∣≡0; ∪-identityˡ; ∪-identityʳ; drop-not-there; Empty-unique; nonempty?; p─q⊆p; p⊂q⇒∣p∣<∣q∣; p─⊥≡p; p∩q≢∅⇒p─q⊂p; p⊆p∪q; q⊆p∪q; x∈p∪q⁻; x∈p∪q⁺; x∈p∩q⁺; x∈⁅x⁆; x∈⁅y⁆⇒x≡y; x∈p⇒p-x⊂p; x∈p∧x∉q⇒x∈p─q; x∈p∧x≢y⇒x∈p-y; x≢y⇒x∉⁅y⁆; x∈p∩q⁻; ∣⁅x⁆∣≡1)
 open import Data.Fin.Subset.Induction using (⊂-wellFounded)
@@ -38,13 +39,13 @@ open import Data.Product.Properties using (,-injectiveˡ; Σ-≡,≡→≡)
 open import Data.Sum using (inj₁; inj₂)
 open import Data.Vec using (Vec; []; _∷_; [_]; _∷ʳ_; count; here; there)
 open import Data.Vec.Bounded as Vec≤ using (Vec≤; _,_)
-open import Data.Vec.Properties using ([]=⇒lookup; lookup-replicate)
+open import Data.Vec.Properties using (≡-dec; []=⇒lookup; lookup-replicate)
 open import Function using (_↔_; _⇔_; _↣_; _∘_; _$-; id; Injection; Injective; Inverse; Inverseᵇ; Inverseˡ; Inverseʳ; mk↔; mk⇔; mk↣; _on_)
 open import Function.Properties.Inverse using (↔-sym; ↔⇒↣)
 open import Induction.WellFounded as Wf using (WellFounded)
 open import Level using (Level)
 open import Relation.Binary.Construct.On using (wellFounded)
-open import Relation.Binary.Definitions using (Irrelevant; Reflexive; Symmetric; Transitive)
+open import Relation.Binary.Definitions using (DecidableEquality; Irrelevant; Reflexive; Symmetric; Transitive)
 open import Relation.Binary.PropositionalEquality as Eq using (_≡_; _≢_; _≗_; refl)
 open import Relation.Nullary using (¬_; _×-dec_; no; yes)
 open import Relation.Nullary.Decidable using (decidable-stable)
@@ -67,6 +68,11 @@ extensionality :
     ((_∈ S) ≐ (_∈ T))
   →      S  ≡     T
 extensionality = uncurry ⊆-antisym
+```
+
+```agda
+_≟_ : DecidableEquality (Subset n)
+_≟_ = ≡-dec _≟ᵇ_
 ```
 
 We define disjointness of sets:
@@ -149,10 +155,8 @@ i≢j⇒∣⁅i,j⁆∣≡2 {i = i} {j} i≢j = ≤-antisym (∣⁅i,j⁆∣≤2
 ∣S∣≡0⇒Empty-S ∣S∣≡0 (_ , there {y = outside} {xs = inside  ∷ _}  _)                   = contradiction ∣S∣≡0 λ()
 ∣S∣≡0⇒Empty-S ∣S∣≡0 (_ , there {y = outside} {xs = outside ∷ xs} (there xs[]=inside)) = >⇒≢ count≟inside>0 ∣S∣≡0
   where
-  open Data.Bool.Properties using (_≟_)
-
-  count≟inside>0 : count (_≟ inside) xs > 0
-  count≟inside>0 = ∈⇒count≟>0 _≟_ (xs[]=x⇒x∈xs xs[]=inside)
+  count≟inside>0 : count (_≟ᵇ inside) xs > 0
+  count≟inside>0 = ∈⇒count≟>0 _≟ᵇ_ (xs[]=x⇒x∈xs xs[]=inside)
 
 ∣S∣≡0⇒S≡∅ : ∣ S ∣ ≡ 0 → S ≡ ∅
 ∣S∣≡0⇒S≡∅ = Empty-unique ∘ ∣S∣≡0⇒Empty-S
@@ -168,8 +172,6 @@ x∈S⇒⁅x⁆∪[S-x]≡S : ∀ {x}
   → ⁅ x ⁆ ∪ (S - x) ≡ S
 x∈S⇒⁅x⁆∪[S-x]≡S {S = S} {x} x∈S = extensionality (⁅x⁆∪[S-x]⊆S , S⊆⁅x⁆∪[S-x])
   where
-  open Data.Fin using (_≟_)
-
   ⁅x⁆∪[S-x]⊆S : ⁅ x ⁆ ∪ (S - x) ⊆ S
   ⁅x⁆∪[S-x]⊆S y∈⁅x⁆∪[S-x]
     with x∈p∪q⁻ _ _ y∈⁅x⁆∪[S-x]
@@ -178,7 +180,7 @@ x∈S⇒⁅x⁆∪[S-x]≡S {S = S} {x} x∈S = extensionality (⁅x⁆∪[S-x]�
 
   S⊆⁅x⁆∪[S-x] : S ⊆ ⁅ x ⁆ ∪ (S - x)
   S⊆⁅x⁆∪[S-x] {x = y} y∈S
-    with y ≟ x
+    with y ≟ᶠ x
   ...  | no  y≢x  = x∈p∪q⁺ (inj₂ (x∈p∧x∉q⇒x∈p─q y∈S (x≢y⇒x∉⁅y⁆ y≢x)))
   ...  | yes refl = x∈p∪q⁺ (inj₁ (x∈⁅x⁆ _))
 
@@ -516,11 +518,9 @@ from-List []       = ∅
 from-List (x ∷ xs) = ⁅ x ⁆ ∪ from-List xs
 
 module _ {n} where
-  open Data.Bool.Properties using () renaming (_≟_ to _≟ᵇ_)
-  open Data.Fin using (_≟_)
+  open Causality.Data.List.DecEq (_≟ᶠ_ {n})
   open Data.Fin.Subset.Properties using (_∈?_)
-  open import Data.List.Membership.DecPropositional (_≟_ {n}) using () renaming (_∈_ to _∈ˡ_; _∈?_ to _∈ˡ?_)
-  open Causality.Data.List.DecEq (_≟_ {n})
+  open import Data.List.Membership.DecPropositional (_≟ᶠ_ {n}) using () renaming (_∈_ to _∈ˡ_; _∈?_ to _∈ˡ?_)
 
   ∈from-List-xs⇒∈xs : (_∈ from-List xs) ⊆ᴾ (_∈ˡ xs)
   ∈from-List-xs⇒∈xs {xs = []}    (there {i = i} x∈from-List-xs) =
@@ -537,11 +537,8 @@ module _ {n} where
 
 
 module _ {n} where
-  open Data.Fin using (_≟_)
-  open Causality.Data.List.DecEq (_≟_ {n})
-
-  open Data.Bool.Properties using () renaming (_≟_ to _≟ᵇ_)
-  open import Data.List.Membership.DecPropositional (_≟_ {n}) using () renaming (_∈_ to _∈ˡ_; _∈?_ to _∈ˡ?_)
+  open Causality.Data.List.DecEq (_≟ᶠ_ {n})
+  open import Data.List.Membership.DecPropositional (_≟ᶠ_ {n}) using () renaming (_∈_ to _∈ˡ_; _∈?_ to _∈ˡ?_)
   open import Data.List.Membership.Propositional.Properties using (∈-allFin; ∈-filter⁺)
   open import Data.List.Relation.Unary.Unique.Propositional.Properties using (allFin⁺; filter⁺)
 
@@ -561,7 +558,7 @@ module _ {n} where
 
   ∈to-List-S⇒∈S : (_∈ˡ to-List S) ⊆ᴾ (_∈ S)
   ∈to-List-S⇒∈S x∈ˡS
-    with lookup-result (Any-filter⇒Any-× (_ ≟_) (_∈? _) {l = allFin n} x∈ˡS)
+    with lookup-result (Any-filter⇒Any-× (_ ≟ᶠ_) (_∈? _) {l = allFin n} x∈ˡS)
   ...  | x≡ , x∈S rewrite Eq.sym x≡ = x∈S
 
   ∈S⇒∈to-List-S : (_∈ S) ⊆ᴾ (_∈ˡ to-List S)
