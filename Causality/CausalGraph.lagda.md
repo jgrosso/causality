@@ -4,6 +4,9 @@ title: Causality.CausalGraph
 
 Definitions and proofs about causal graphs.
 
+<details>
+<summary>Some initial bookkeeping.</summary>
+
 ```agda
 {-# OPTIONS --without-K --safe #-}
 
@@ -36,8 +39,7 @@ open import Data.Product using (∃-syntax; Σ; Σ-syntax; _×_; _,_) renaming (
 open import Data.Sum using (_⊎_)
 open import Function using (_∘_; case_of_)
 open import Relation.Binary.PropositionalEquality using (_≡_; _≢_; refl)
-open import Relation.Nullary using (¬_)
-open import Relation.Nullary.Negation using (¬?)
+open import Relation.Nullary using (¬_; ¬?; contradiction)
 ```
 </details>
 
@@ -51,6 +53,7 @@ P -×- Q = λ x → P x × Q x
 _-⊎-_ : ∀ {a b c} {A : Set a} → (A → Set b) → (A → Set c) → (A → Set _)
 P -⊎- Q = λ x → P x ⊎ Q x
 ```
+</details>
 </details>
 
 We parameterize our development by an arbitrary DAG $G$.
