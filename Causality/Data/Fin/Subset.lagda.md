@@ -93,23 +93,30 @@ Disjoint-∅ʳ S Nonempty-S∩∅ rewrite ∩-zeroʳ S = ∉⊥ (Nonempty-S∩�
 Disjoint-∅ˡ : (S : Subset n) → Disjoint ∅ S
 Disjoint-∅ˡ S Nonempty-∅∩S rewrite ∩-zeroˡ S = ∉⊥ (Nonempty-∅∩S ₂)
 
-Disjoint-∪ˡ : Disjoint (S ∪ T) U → Disjoint S U
-Disjoint-∪ˡ {S = S} {T} {U} Disjoint-S∪T-U (x , x∈S∩U)
+Disjoint-∪⁻ : Disjoint (S ∪ T) U → Disjoint S U
+Disjoint-∪⁻ {S = S} {T} {U} Disjoint-S∪T-U (x , x∈S∩U)
   with (x∈S , x∈U) ← x∈p∩q⁻ _ _ x∈S∩U
   = Disjoint-S∪T-U (-, x∈[S∪T]∩U)
   where
   x∈[S∪T]∩U : x ∈ (S ∪ T) ∩ U
   x∈[S∪T]∩U = x∈p∩q⁺ (x∈p∪q⁺ (inj₁ x∈S) , x∈U)
 
+Disjoint-∪⁺ : Disjoint S U → Disjoint S T → Disjoint S (U ∪ T)
+Disjoint-∪⁺ Disjoint-S-U Disjoint-S-T (x , x∈S∩[U∪T])
+  with (x∈S , x∈U∪T) ← x∈p∩q⁻ _ _ x∈S∩[U∪T]
+  with x∈p∪q⁻ _ _ x∈U∪T
+...  | inj₁ x∈U = Disjoint-S-U (-, x∈p∩q⁺ (x∈S , x∈U))
+...  | inj₂ x∈T = Disjoint-S-T (-, x∈p∩q⁺ (x∈S , x∈T))
+
 Disjoint-swap :
     Disjoint S T
   → Disjoint (S ∪ T) U
-  → Disjoint T (S ∪ U)
-Disjoint-swap {S = S} {T} {U} Disjoint-S-T Disjoint-S∪T-U (x , x∈T∩[S∪U])
-  with (x∈T , x∈S∪U) ← x∈p∩q⁻ _ _ x∈T∩[S∪U]
-  with x∈p∪q⁻ _ _ x∈S∪U
-...  | inj₁ x∈S = Disjoint-S-T (-, x∈p∩q⁺ (x∈S , x∈T))
-...  | inj₂ x∈U = Disjoint-S∪T-U (x , x∈p∩q⁺ (x∈p∪q⁺ (inj₂ x∈T) , x∈U))
+  → Disjoint S (T ∪ U)
+Disjoint-swap {S = S} {T} {U} Disjoint-S-T Disjoint-S∪T-U (x , x∈S∩[T∪U])
+  with (x∈S , x∈T∪U) ← x∈p∩q⁻ _ _ x∈S∩[T∪U]
+  with x∈p∪q⁻ _ _ x∈T∪U
+...  | inj₁ x∈T = Disjoint-S-T (-, x∈p∩q⁺ (x∈S , x∈T))
+...  | inj₂ x∈U = Disjoint-S∪T-U (-, x∈p∩q⁺ (x∈p∪q⁺ (inj₁ x∈S) , x∈U))
 
 ∉-∩-Disjoint : Disjoint S T → x ∉ S ∩ T
 ∉-∩-Disjoint Disjoint-S-T x∈S∩T = Disjoint-S-T (-, x∈S∩T)
@@ -336,9 +343,9 @@ module _ {n} where
       → P (⁅ x ⁆ ∪ S)
     inductive-step {x = x} {S} x∉S P-S T Disjoint-⁅x⁆∪S-T =
       begin
-        ∣ (⁅ x ⁆ ∪ S) ∪ T ∣     ≡⟨ ∪-comm ⁅ x ⁆ _ ⟩⟨ Eq.cong (λ ∙ → ∣ ∙ ∪ T ∣) ⟩
-        ∣ (S ∪ ⁅ x ⁆) ∪ T ∣     ≡⟨ ∪-assoc S _ _ ⟩⟨ Eq.cong ∣_∣ ⟩
-        ∣ S ∪ (⁅ x ⁆ ∪ T) ∣     ≡⟨ P-S _ Disjoint-S-⁅x⁆∪T ⟩
+        ∣ (⁅ x ⁆ ∪ S) ∪ T ∣      ≡⟨ ∪-comm ⁅ x ⁆ _ ⟩⟨ Eq.cong (λ ∙ → ∣ ∙ ∪ T ∣) ⟩
+        ∣ (S ∪ ⁅ x ⁆) ∪ T ∣      ≡⟨ ∪-assoc S _ _ ⟩⟨ Eq.cong ∣_∣ ⟩
+        ∣ S ∪ (⁅ x ⁆ ∪ T) ∣      ≡⟨ P-S _ Disjoint-S-⁅x⁆∪T ⟩
         ∣ S ∣ + ∣ ⁅ x ⁆ ∪ T ∣    ≡⟨ x∉S⇒∣⁅x⁆∪S∣≡1+∣S∣ x∉T ⟩⟨ Eq.cong (∣ S ∣ +_) ⟩
         ∣ S ∣ + suc ∣ T ∣        ≡⟨ +-assoc ∣ S ∣ _ _ ⟩⟨ Eq.sym ⟩
         (∣ S ∣ + 1) + ∣ T ∣      ≡⟨ +-comm ∣ S ∣ _ ⟩⟨ Eq.cong (_+ ∣ T ∣) ⟩
@@ -347,10 +354,13 @@ module _ {n} where
       ∎
       where
       x∉T : x ∉ T
-      x∉T = Disjoint⁅x⁆⇒x∉ (Disjoint-∪ˡ Disjoint-⁅x⁆∪S-T)
+      x∉T = Disjoint⁅x⁆⇒x∉ (Disjoint-∪⁻ Disjoint-⁅x⁆∪S-T)
 
       Disjoint-S-⁅x⁆∪T : Disjoint S (⁅ x ⁆ ∪ T)
-      Disjoint-S-⁅x⁆∪T = Disjoint-swap (x∉⇒Disjoint⁅x⁆ x∉S) Disjoint-⁅x⁆∪S-T
+      Disjoint-S-⁅x⁆∪T =
+        Disjoint-swap
+          (Disjoint-sym (x∉⇒Disjoint⁅x⁆ x∉S))
+          (Eq.subst (λ ∙ → Disjoint ∙ _) (∪-comm _ _) Disjoint-⁅x⁆∪S-T)
 
   Disjoint-S-T⇒∣S∪T|≡∣S∣+∣T∣ : Π[ P ]
   Disjoint-S-T⇒∣S∪T|≡∣S∣+∣T∣ = induction-on-elements P-∅ inductive-step
@@ -581,4 +591,18 @@ module _ {n} where
       ∣ from-List (to-List S) ∣    ≡⟨ from-to-List S ⟩⟨ Eq.cong ∣_∣ ⟩
       ∣ S ∣
     ∎
+```
+
+```agda
+T⊆S⇒S∪T≡S : T ⊆ S → S ∪ T ≡ S
+T⊆S⇒S∪T≡S {T = T} {S = S} T⊆S = extensionality (S∪T⊆S , S⊆S∪T)
+  where
+  S∪T⊆S : S ∪ T ⊆ S
+  S∪T⊆S x∈S∪T
+    with x∈p∪q⁻ _ _ x∈S∪T
+  ...  | inj₁ x∈S = x∈S
+  ...  | inj₂ x∈T = T⊆S x∈T
+
+  S⊆S∪T : S ⊆ S ∪ T
+  S⊆S∪T = x∈p∪q⁺ ∘ inj₁
 ```
