@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Causality.Relation.Binary.PropositionalEquality</title>
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <link rel="stylesheet" href="Agda.css" />
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Causality.Relation.Binary.PropositionalEquality</h1>
+</header>
+<p>Definitions and proofs about propositional equality.</p>
+<pre class="Agda"><a id="127" class="Symbol">{-#</a> <a id="131" class="Keyword">OPTIONS</a> <a id="139" class="Pragma">--without-K</a> <a id="151" class="Pragma">--safe</a> <a id="158" class="Symbol">#-}</a>
+
+<a id="163" class="Keyword">module</a> <a id="170" href="Causality.Relation.Binary.PropositionalEquality.html" class="Module">Causality.Relation.Binary.PropositionalEquality</a> <a id="218" class="Keyword">where</a>
+
+<a id="225" class="Keyword">open</a> <a id="230" class="Keyword">import</a> <a id="237" href="Data.Empty.html" class="Module">Data.Empty</a> <a id="248" class="Keyword">using</a> <a id="254" class="Symbol">(</a><a id="255" href="Data.Empty.html#1050" class="Function">⊥-elim</a><a id="261" class="Symbol">)</a>
+<a id="263" class="Keyword">open</a> <a id="268" class="Keyword">import</a> <a id="275" href="Relation.Binary.PropositionalEquality.html" class="Module">Relation.Binary.PropositionalEquality</a> <a id="313" class="Keyword">using</a> <a id="319" class="Symbol">(</a><a id="320" href="Agda.Builtin.Equality.html#133" class="Datatype Operator">_≡_</a><a id="323" class="Symbol">;</a> <a id="325" href="Relation.Binary.PropositionalEquality.Core.html#853" class="Function Operator">_≢_</a><a id="328" class="Symbol">;</a> <a id="330" href="Agda.Builtin.Equality.html#190" class="InductiveConstructor">refl</a><a id="334" class="Symbol">;</a> <a id="336" href="Relation.Binary.PropositionalEquality.Core.html#1707" class="Function">sym</a><a id="339" class="Symbol">;</a> <a id="341" href="Relation.Binary.PropositionalEquality.Core.html#1752" class="Function">trans</a><a id="346" class="Symbol">)</a>
+<a id="348" class="Keyword">open</a> <a id="353" class="Keyword">import</a> <a id="360" href="Relation.Nullary.html" class="Module">Relation.Nullary</a> <a id="377" class="Keyword">using</a> <a id="383" class="Symbol">(</a><a id="384" href="Relation.Nullary.Negation.Core.html#824" class="Function Operator">¬_</a><a id="386" class="Symbol">)</a>
+
+<a id="contra"></a><a id="389" href="Causality.Relation.Binary.PropositionalEquality.html#389" class="Function">contra</a> <a id="396" class="Symbol">:</a> <a id="398" class="Symbol">∀</a> <a id="400" class="Symbol">{</a><a id="401" href="Causality.Relation.Binary.PropositionalEquality.html#401" class="Bound">a</a> <a id="403" href="Causality.Relation.Binary.PropositionalEquality.html#403" class="Bound">b</a><a id="404" class="Symbol">}</a> <a id="406" class="Symbol">{</a><a id="407" href="Causality.Relation.Binary.PropositionalEquality.html#407" class="Bound">A</a> <a id="409" class="Symbol">:</a> <a id="411" href="Agda.Primitive.html#320" class="Primitive">Set</a> <a id="415" href="Causality.Relation.Binary.PropositionalEquality.html#401" class="Bound">a</a><a id="416" class="Symbol">}</a> <a id="418" class="Symbol">{</a><a id="419" href="Causality.Relation.Binary.PropositionalEquality.html#419" class="Bound">B</a> <a id="421" class="Symbol">:</a> <a id="423" href="Agda.Primitive.html#320" class="Primitive">Set</a> <a id="427" href="Causality.Relation.Binary.PropositionalEquality.html#403" class="Bound">b</a><a id="428" class="Symbol">}</a> <a id="430" class="Symbol">{</a><a id="431" href="Causality.Relation.Binary.PropositionalEquality.html#431" class="Bound">x</a> <a id="433" href="Causality.Relation.Binary.PropositionalEquality.html#433" class="Bound">y</a> <a id="435" href="Causality.Relation.Binary.PropositionalEquality.html#435" class="Bound">z</a> <a id="437" class="Symbol">:</a> <a id="439" href="Causality.Relation.Binary.PropositionalEquality.html#407" class="Bound">A</a><a id="440" class="Symbol">}</a>
+  <a id="444" class="Symbol">→</a> <a id="446" href="Causality.Relation.Binary.PropositionalEquality.html#433" class="Bound">y</a> <a id="448" href="Agda.Builtin.Equality.html#133" class="Datatype Operator">≡</a> <a id="450" href="Causality.Relation.Binary.PropositionalEquality.html#431" class="Bound">x</a>
+  <a id="454" class="Symbol">→</a> <a id="456" href="Causality.Relation.Binary.PropositionalEquality.html#433" class="Bound">y</a> <a id="458" href="Agda.Builtin.Equality.html#133" class="Datatype Operator">≡</a> <a id="460" href="Causality.Relation.Binary.PropositionalEquality.html#435" class="Bound">z</a>
+  <a id="464" class="Symbol">→</a> <a id="466" href="Causality.Relation.Binary.PropositionalEquality.html#431" class="Bound">x</a> <a id="468" href="Relation.Binary.PropositionalEquality.Core.html#853" class="Function Operator">≢</a> <a id="470" href="Causality.Relation.Binary.PropositionalEquality.html#435" class="Bound">z</a>
+  <a id="474" class="Symbol">→</a> <a id="476" href="Causality.Relation.Binary.PropositionalEquality.html#419" class="Bound">B</a>
+<a id="478" href="Causality.Relation.Binary.PropositionalEquality.html#389" class="Function">contra</a> <a id="485" href="Agda.Builtin.Equality.html#190" class="InductiveConstructor">refl</a> <a id="490" href="Agda.Builtin.Equality.html#190" class="InductiveConstructor">refl</a> <a id="495" href="Causality.Relation.Binary.PropositionalEquality.html#495" class="Bound">x≢z</a> <a id="499" class="Symbol">=</a> <a id="501" href="Data.Empty.html#1050" class="Function">⊥-elim</a> <a id="508" class="Symbol">(</a><a id="509" href="Causality.Relation.Binary.PropositionalEquality.html#495" class="Bound">x≢z</a> <a id="513" href="Agda.Builtin.Equality.html#190" class="InductiveConstructor">refl</a><a id="517" class="Symbol">)</a>
+</pre>
+</body>
+</html>
