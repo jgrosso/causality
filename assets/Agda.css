@@ -105,9 +105,10 @@ body {
     font-size: 11pt;
 }
 
-.Agda, code {
+pre.Agda {
     font-family: 'JuliaMono';
     font-size: 10pt;
+    overflow: scroll;
 }
 
 details {
