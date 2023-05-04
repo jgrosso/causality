@@ -147,7 +147,7 @@ The following will be parameterized by the implementation of a dependency model.
 <details>
 <summary>Why does `WeakUnion` require `Disjoint y w`?</summary>
 <div>
-Neither [@geiger] nor [@pearl] explicitly require that $y$ and $w$ be disjoint. However, if this were not the case, we can rule out the vast majority of "useful" semigraphoids. For example, we can always let $w = y$; since the resulting triple must be disjoint, this implies $y = ∅$. Here is a formal proof of this fact:
+Neither [@geiger] nor [@pearl] explicitly requires that $y$ and $w$ be disjoint. However, if this were not the case, we can rule out the vast majority of "useful" semigraphoids. For example, we can always let $w = y$; since the resulting triple must be disjoint, this implies $y = ∅$. Here is a formal proof of this fact:
 
 ```agda
     module WeakUnionDisjointness where

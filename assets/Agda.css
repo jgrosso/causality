@@ -113,10 +113,13 @@ pre.Agda {
 
 details {
     border: 2px solid #eee;
-    font-size: 10pt;
+    margin: 2em 0;
 }
 
 details > summary {
+    background-color: #eee;
+    color: #444;
+    font-size: 10pt;
     padding: 0.25em 0.5em;
 }
 
@@ -125,12 +128,8 @@ details > summary::after {
     padding-left: 0.5em;
 }
 
-details > summary {
-    color: #444;
-    background-color: #eee;
-}
-
 details[open] > summary {
+    border-bottom: 2px solid #eee;
     color: black;
 }
 
@@ -139,12 +138,18 @@ details[open] > div {
     padding: 0.5em 1em;
 }
 
-details .Agda, details code {
-    font-size: 9pt;
+details + details:last-child {
+    margin-bottom: 1em;
 }
 
-details + details {
-    margin-top: 1em;
+.references {
+    border-top: 2px solid #ddd;
+    margin: 1em 2em;
+    padding-top: 2em;
+}
+
+.csl-left-margin {
+    font-variant-numeric: tabular-nums;
 }
 
 
