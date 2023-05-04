@@ -6,7 +6,7 @@ Definitions and proofs about (semi-)graphoids.
 
 <details>
 <summary>Some initial bookkeeping.</summary>
-
+<div>
 ```agda
 {-# OPTIONS --without-K --safe #-}
 
@@ -33,6 +33,7 @@ private
   variable
     a : Level
 ```
+</div>
 </details>
 
 We begin by formalizing the following definition on pg. 11 of [@geiger]:
@@ -145,7 +146,7 @@ The following will be parameterized by the implementation of a dependency model.
 
 <details>
 <summary>Why does `WeakUnion` require `Disjoint y w`?</summary>
-
+<div>
 Neither [@geiger] nor [@pearl] explicitly require that $y$ and $w$ be disjoint. However, if this were not the case, we can rule out the vast majority of "useful" semigraphoids. For example, we can always let $w = y$; since the resulting triple must be disjoint, this implies $y = ∅$. Here is a formal proof of this fact:
 
 ```agda
@@ -176,6 +177,7 @@ Neither [@geiger] nor [@pearl] explicitly require that $y$ and $w$ be disjoint. 
               (_ ⸴ z∪⁅𝑦⁆⊥y ⸴ _) = I⟨x,z,y⟩⇒I⟨x,z∪w,y⟩ I⟨x,z,y⟩
           in contradiction (-, x∈p∩q⁺ (x∈p∪q⁺ (inj₂ (x∈⁅x⁆ _)) ⸴ 𝑦∈y)) z∪⁅𝑦⁆⊥y
 ```
+</div>
 </details>
 
 ```agda

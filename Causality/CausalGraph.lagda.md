@@ -6,7 +6,7 @@ Definitions and proofs about causal graphs.
 
 <details>
 <summary>Some initial bookkeeping.</summary>
-
+<div>
 ```agda
 {-# OPTIONS --without-K --safe #-}
 
@@ -24,7 +24,7 @@ open import Causality.Data.List
 
 <details>
 <summary>Standard library imports.</summary>
-
+<div>
 ```agda
 open import Data.Fin using (Fin)
 open import Data.Fin.Subset using (Subset; ⋃)
@@ -41,11 +41,12 @@ open import Function using (_∘_; case_of_)
 open import Relation.Binary.PropositionalEquality using (_≡_; _≢_; refl)
 open import Relation.Nullary using (¬_; ¬?; contradiction)
 ```
+</div>
 </details>
 
 <details>
 <summary>Some utility functions, for use below.</summary>
-
+<div>
 ```agda
 _-×-_ : ∀ {a b c} {A : Set a} → (A → Set b) → (A → Set c) → (A → Set _)
 P -×- Q = λ x → P x × Q x
@@ -53,7 +54,9 @@ P -×- Q = λ x → P x × Q x
 _-⊎-_ : ∀ {a b c} {A : Set a} → (A → Set b) → (A → Set c) → (A → Set _)
 P -⊎- Q = λ x → P x ⊎ Q x
 ```
+</div>
 </details>
+</div>
 </details>
 
 We parameterize our development by an arbitrary DAG $G$.
@@ -74,7 +77,7 @@ We define a "path" through a causal graph to be a list of vertices connected by 
 
 We require that the path be acyclic, i.e. that no vertex is revisited, i.e. that the list of vertices
 has no duplicates. We will also require that there are at least two vertices in our list, so that
-we have distinct start– and endpoints.
+we have distinct start- and endpoints.
 
 ```
     field acyclic            : Unique nodes
@@ -110,7 +113,7 @@ We will say `i ∃—↠ j` iff there exists a path starting at $i$ and ending a
 
 <details>
 <summary>Some helper functions for working with paths.</summary>
-
+<div>
 ```agda
   triples-along : Path → List (V × V × V)
   triples-along = triples ∘ nodes
@@ -119,6 +122,7 @@ We will say `i ∃—↠ j` iff there exists a path starting at $i$ and ending a
   p visits v = v ∈ nodes p
     where open import Data.List.Membership.Propositional using (_∈_)
 ```
+</div>
 </details>
 
 A subset of $V$ is a valid conditioning set (w.r.t. some path `i —↠ j`) iff $C \subseteq V \setminus \{ i , j \}$.
@@ -137,7 +141,7 @@ We will denote the empty conditioning set by $\varnothing$.
 
 <details>
 <summary>Groundwork to let us define colliders, noncolliders, etc.</summary>
-
+<div>
 ```agda
   module Pattern where
 
@@ -155,6 +159,7 @@ We will denote the empty conditioning set by $\varnothing$.
 
     open Notation
 ```
+</div>
 </details>
 
 ```agda
