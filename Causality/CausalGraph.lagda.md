@@ -105,7 +105,7 @@ For any two vertices $i, j$ in $G$, we will let `i —↠ j` denote the set of p
   from —↠ to = ∃[ p ] start p ≡ from × end p ≡ to
 ```
 
-We will say `i ∃—↠ j` iff there exists a path starting at $i$ and ending at $j$.
+We will say `i ∃—↠ j` if there exists a path starting at $i$ and ending at $j$.
 
 ```agda
   _∃—↠_ = _—↠_
@@ -125,7 +125,7 @@ We will say `i ∃—↠ j` iff there exists a path starting at $i$ and ending a
 </div>
 </details>
 
-A subset of $V$ is a valid conditioning set (w.r.t. some path `i —↠ j`) iff $C \subseteq V \setminus \{ i , j \}$.
+A subset of $V$ is a valid conditioning set (w.r.t. some path `i —↠ j`) if $C \subseteq V \setminus \{ i , j \}$.
 
 ```agda
   ConditioningSet : V → V → Set _
@@ -194,14 +194,14 @@ We will write `colliders along p` to denote "the set of all vertices that are co
   open Pattern
 ```
 
-A vertex $j$ is a descendant of $i$ iff there exists a path from $i$ to $j$.
+A vertex $j$ is a descendant of $i$ if there exists a path from $i$ to $j$.
 
 ```agda
   descendants : V → Set
   descendants i = ∃[ j ] i ∃—↠ j
 ```
 
-A path from $i$ to $j$ is unblocked (conditional on $C$) iff:
+A path from $i$ to $j$ is unblocked (conditional on $C$) if:
 
 ```agda
   unblocked_∣_ : ∀ {i j} → i —↠ j → ConditioningSet i j → Set
@@ -236,35 +236,35 @@ A path from $i$ to $j$ is unblocked (conditional on $C$) iff:
     where open import Data.Fin.Subset using (_∈_; _∉_)
 ```
 
-A path is blocked iff it is not unblocked.
+A path is blocked if it is not unblocked.
 
 ```agda
   blocked_∣_ : ∀ {i j} → i —↠ j → ConditioningSet i j → Set
   blocked p ∣ C = ¬ unblocked p ∣ C
 ```
 
-Two vertices are $d$-separated (conditional on $C$) iff all paths between them are blocked.
+Two vertices are $d$-separated (conditional on $C$) if all paths between them are blocked.
 
 ```agda
   _⊥_∣_ : (i j : V) → ConditioningSet i j → Set
   i ⊥ j ∣ C = ∀ p → blocked p ∣ C
 ```
 
-Two vertices are $d$-connected (conditional on $C$) iff they are not $d$-separated.
+Two vertices are $d$-connected (conditional on $C$) if they are not $d$-separated.
 
 ```agda
   _⊥̸_∣_ : (i j : V) → ConditioningSet i j → Set
   i ⊥̸ j ∣ C = ¬ i ⊥ j ∣ C
 ```
 
-Two vertices are $d$-separated (unconditionally) iff they are $d$-separated conditional on $\varnothing$.
+Two vertices are $d$-separated (unconditionally) if they are $d$-separated conditional on $\varnothing$.
 
 ```agda
   _⊥_ : V → V → Set
   i ⊥ j = i ⊥ j ∣ ∅
 ```
 
-Two vertices are $d$-connected (uncoditionally) iff they are not $d$-separated (unconditionally).
+Two vertices are $d$-connected (uncoditionally) if they are not $d$-separated (unconditionally).
 
 ```agda
   _⊥̸_ : V → V → Set
