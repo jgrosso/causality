@@ -74,6 +74,7 @@ html, body {
 
 body {
     line-height: 1.5;
+    margin: 3em;
     -webkit-font-smoothing: antialiased;
 }
 
@@ -103,6 +104,12 @@ p, h1, h2, h3, h4, h5, h6 {
 body {
     font-family: 'Lora', serif;
     font-size: 11pt;
+}
+
+/* Ensure the same amount of vertical and horizontal space before the top and left (resp.) of the character glyphs themselves, rather than the whole element. */
+#title-block-header {
+    line-height: 1;
+    margin-bottom: 2em;
 }
 
 pre.Agda {
@@ -145,7 +152,7 @@ details + details:last-child {
 .references {
     border-top: 2px solid #ddd;
     margin: 1em 2em;
-    padding-top: 2em;
+    padding-top: 1em;
 }
 
 .csl-left-margin {
