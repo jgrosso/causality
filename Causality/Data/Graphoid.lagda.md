@@ -20,14 +20,14 @@ open import Data.Fin.Subset.Properties                  using (∪-comm; ∪-ide
 open import Data.List                                   using (List; map)
 open import Data.List.Membership.Propositional          using ()                                                                               renaming (_∈_ to _∈ˡ_)
 open import Data.Nat                                    using (ℕ; suc)
-open import Data.Product                                using (∃-syntax; _×_; -,_)                                                             renaming (_,_ to _⸴_)
+open import Data.Product                                using (∃-syntax; Σ-syntax; _×_; -,_)                                                   renaming (_,_ to _⸴_)
 open import Data.Sum                                    using (_⊎_; inj₁; inj₂)
 open import Function                                    using (_∘_; flip)
-open import Level                                       using (Level)                                                                          renaming (suc to ↑)
+open import Level                                       using (Level; 0ℓ)                                                                      renaming (suc to ↑)
 open import Relation.Binary.Definitions                 using (DecidableEquality)
 open import Relation.Binary.PropositionalEquality as Eq using (_≡_; refl)
-open import Relation.Nullary                            using (contradiction; no; yes)
-open import Relation.Unary                              using (Pred)                                                                           renaming (_∈_ to _∈ᵖ_)
+open import Relation.Nullary                            using (¬_; contradiction; no; yes)
+open import Relation.Unary                              using (Pred)                                                                           renaming (_∈_ to _∈ᵖ_; _⊂_ to _⊂ᵖ_)
 
 private
   variable
@@ -43,7 +43,7 @@ We begin by formalizing the following definition on pg. 11 of [@geiger]:
 We will parameterize our definitions by the cardinality $|U|$ of our universe of discourse. We will represent the universe itself by a finite set $U$ (i.e. with cardinality $|U|$).
 
 ```agda
-module Graphoid (∣U∣ : ℕ) where
+module IntersectionalGraphoid (∣U∣ : ℕ) where
   U : Set _
   U = Fin ∣U∣
 ```
@@ -220,21 +220,21 @@ We can generate a free semi-graphoid, which will be convenient when we construct
     module _ where
       private
         variable
-          I : List DisjointTriple
+          I       : List DisjointTriple
           x y z w : Subset ∣U∣
-          x⊥y : Disjoint x y
-          x⊥z : Disjoint x z
-          x⊥w : Disjoint x w
-          y⊥x : Disjoint y x
-          y⊥z : Disjoint y z
-          z⊥x : Disjoint z x
-          z⊥y : Disjoint z y
-          x⊥y∪w : Disjoint x (y ∪ w)
-          x⊥z∪w : Disjoint x (z ∪ w)
-          x⊥z∪y : Disjoint x (z ∪ y)
-          z⊥y∪w : Disjoint z (y ∪ w)
-          z∪w⊥y : Disjoint (z ∪ w) y
-          z∪y⊥w : Disjoint (z ∪ y) w
+          x⊥y     : Disjoint x y
+          x⊥z     : Disjoint x z
+          x⊥w     : Disjoint x w
+          y⊥x     : Disjoint y x
+          y⊥z     : Disjoint y z
+          z⊥x     : Disjoint z x
+          z⊥y     : Disjoint z y
+          x⊥y∪w   : Disjoint x (y ∪ w)
+          x⊥z∪w   : Disjoint x (z ∪ w)
+          x⊥z∪y   : Disjoint x (z ∪ y)
+          z⊥y∪w   : Disjoint z (y ∪ w)
+          z∪w⊥y   : Disjoint (z ∪ w) y
+          z∪y⊥w   : Disjoint (z ∪ y) w
 
       private
         _∋_ : List DisjointTriple → DisjointTriple → Set
