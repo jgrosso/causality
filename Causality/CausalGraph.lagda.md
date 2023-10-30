@@ -275,6 +275,6 @@ To intervene on a set of vertices $S$, we remove all edges going into vertices o
 
 ```agda
   intervene-on : Subset |V| → DAG
-  intervene-on S = filter-edges (λ{ (_ , to) → ¬? (to ∈? S) })
+  intervene-on S = filter-edges λ{ (_ , to) → ¬? (to ∈? S) }
     where open import Data.Fin.Subset.Properties using (_∈?_)
 ```
