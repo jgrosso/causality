@@ -243,7 +243,7 @@ module _ {P : Pred (Subset n) a}
     step S P-ind-⊂
       with nonempty? S
     ...  | no  Empty-S rewrite Eq.sym (Empty-unique Empty-S) = P-∅
-    ...  | yes Nonempty-S = P-ind Nonempty-S (P-ind-⊂ $-)
+    ...  | yes Nonempty-S = P-ind Nonempty-S P-ind-⊂
 
   strong-induction : Π[ P ]
   strong-induction = wfRec _ _ step
@@ -266,7 +266,7 @@ module _ {P : Pred (Subset n) a}
     ...  | no  Empty-S rewrite Eq.sym (Empty-unique Empty-S) = P-∅
     ...  | yes (x , x∈S)
            rewrite Eq.sym (x∈S⇒⁅x⁆∪[S-x]≡S x∈S)
-           = P-ind (P-ind-⊂S _) (x∉S-x _ _)
+           = P-ind P-ind-⊂S (x∉S-x _ _)
 
   pointed-strong-induction : Π[ P ]
   pointed-strong-induction = wfRec _ _ step
@@ -445,7 +445,7 @@ module _  where
       → ∃ (_∈ T - to x ₁)
       → ∃ (_∈ S - x ₁)
     from-remove {x = x}
-      = map₂ (Eq.subst (λ ∙ → _ ∈ S - ∙ ₁) (inverseʳ _)) ∘
+      = map₂ (Eq.subst (λ ∙ → _ ∈ S - ∙ ₁) (inverseʳ Eq.refl)) ∘
         to-remove (↔-sym S≅T)
 
     from-remove-correct : ∀ {x} → ι ∘ from-remove {x} ≗ from ∘ ι
@@ -457,23 +457,23 @@ module _  where
 
     from-to-remove-inv : ∀ {x}
       → Inverseˡ _≡_ _≡_ (to-remove S≅T {x}) (from-remove S≅T)
-    from-to-remove-inv {x = x} = ↣-monic ι-↣ ι∘to-remove∘from-remove≡ι
+    from-to-remove-inv {x = x} Eq.refl = ↣-monic ι-↣ ι∘to-remove∘from-remove≡ι _
       where
       ι∘to-remove∘from-remove≡ι : ι ∘ to-remove S≅T {x} ∘ from-remove S≅T ≗ ι
       ι∘to-remove∘from-remove≡ι y′
         rewrite to-remove-correct S≅T {x} (from-remove S≅T y′)
               | from-remove-correct S≅T y′
-        = inverseˡ _
+        = inverseˡ Eq.refl
 
     to-from-remove-inv : ∀ {x}
       → Inverseʳ _≡_ _≡_ (to-remove S≅T {x}) (from-remove S≅T)
-    to-from-remove-inv {x = x} = ↣-monic ι-↣ ι∘from-remove∘to-remove≡ι
+    to-from-remove-inv {x = x} Eq.refl = ↣-monic ι-↣ ι∘from-remove∘to-remove≡ι _
       where
       ι∘from-remove∘to-remove≡ι : ι ∘ from-remove S≅T ∘ to-remove S≅T {x} ≗ ι
       ι∘from-remove∘to-remove≡ι x′
         rewrite from-remove-correct S≅T (to-remove S≅T {x} x′)
               | to-remove-correct S≅T {x} x′
-        = inverseʳ _
+        = inverseʳ Eq.refl
 
     ≅-remove : (x : ∃ (_∈ S))
       → (S - x ₁) ≅ (T - to x ₁)

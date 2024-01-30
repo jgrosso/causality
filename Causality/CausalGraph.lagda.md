@@ -264,7 +264,7 @@ Two vertices are $d$-separated (unconditionally) if they are $d$-separated condi
   i ⊥ j = i ⊥ j ∣ ∅
 ```
 
-Two vertices are $d$-connected (uncoditionally) if they are not $d$-separated (unconditionally).
+Two vertices are $d$-connected (unconditionally) if they are not $d$-separated (unconditionally).
 
 ```agda
   _⊥̸_ : V → V → Set

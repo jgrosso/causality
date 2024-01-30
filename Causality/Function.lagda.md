@@ -44,7 +44,8 @@ module _ where
       → g ∘ f ≗ h ∘ f
       → g ≗ h
     ↠-epic gf≡hf x
-      with (f⁻¹[x] , Eq.refl) ← f-surjective x
+      with (f⁻¹[x] , h) ← f-surjective x
+      rewrite Eq.sym (h Eq.refl)
       = gf≡hf f⁻¹[x]
 
 
@@ -54,7 +55,7 @@ module _ where
     ↩-epic : {g h : B → C}
       → g ∘ f ≗ h ∘ f
       → g ≗ h
-    ↩-epic = ↠-epic (mk↠ λ y → f⁻¹ y , f-inverseˡ y)
+    ↩-epic = ↠-epic (mk↠ λ y → f⁻¹ y , f-inverseˡ)
 
 
 module Pointwise {A : Set a} {B : Set b} (_≈_ : Rel B ℓ) where

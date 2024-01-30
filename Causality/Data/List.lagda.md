@@ -239,7 +239,7 @@ strong-induction-on-length : ∀ {p} (P : List A → Set p)
   → Π[ P ]
 strong-induction-on-length P base step = wfRec _ P λ where
     []       P-ind → base
-    (x ∷ xs) P-ind → step refl λ ys → P-ind ys ∘ s≤s
+    (x ∷ xs) P-ind → step refl λ ys → P-ind ∘ s≤s
   where open Wf.All (wellFounded length <-wellFounded) using (wfRec)
 
 _−_ : ∀ {x} (xs : List A) → x ∈ xs → List A
